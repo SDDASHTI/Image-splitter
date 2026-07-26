@@ -55,4 +55,4 @@ Since this is a client-side web application, **no installation or build steps ar
 
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/your-username/image-splitter-web.git](https://github.com/your-username/image-splitter-web.git)
+   git clone https://github.com/SDDASHTI/Image-splitter.git
