@@ -83,8 +83,8 @@
 
 ## 🚀 Quick Start
 
-1. Download or clone the `index.html` file.
-2. Open `index.html` in any modern web browser (Chrome, Firefox, Edge, Safari).
+1. Download or clone the `image_splinter.html` file.
+2. Open `image_splinter.html` in any modern web browser (Chrome, Firefox, Edge, Safari).
 3. Drag & Drop your sprite sheet or click **Select Image** to get started!
 
 ---
