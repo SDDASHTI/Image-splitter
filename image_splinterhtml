@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Splitter v1.1</title>
+    <title>Image Splitter v1.2</title>
     <!-- Vazirmatn Font (CDN with system fallback) -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     <!-- JSZip CDN -->
@@ -219,68 +219,84 @@
             padding: 20px;
         }
 
-        /* Crop Boxes */
+        /* Crop Boxes & Responsive UI (Fixed Handle Scaling Bugs) */
         .crop-box {
             position: absolute;
-            border: 1.5px solid var(--box-border);
+            border: calc(1.5px / var(--zoom-scale, 1)) solid var(--box-border);
             background-color: var(--box-bg);
-            border-radius: 2px;
+            border-radius: calc(2px / var(--zoom-scale, 1));
             cursor: move;
             box-shadow: 0 2px 6px rgba(0,0,0,0.15);
         }
 
         .crop-box.selected {
             border-color: #f59e0b;
-            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.4);
+            box-shadow: 0 0 0 calc(2px / var(--zoom-scale, 1)) rgba(245, 158, 11, 0.4);
         }
 
+        /* هدر کادر که حالا مقیاس معکوس زوم را به صورت یکجا دریافت می‌کند */
         .crop-header {
             position: absolute;
-            top: -20px;
+            bottom: 100%; /* چسبیدن دقیق به لبه بالایی بلاک */
+            margin-bottom: 2px;
             display: flex;
-            gap: 3px;
+            gap: 4px;
             align-items: center;
             pointer-events: auto;
+            transform-origin: bottom right; /* نقطه اتصال در سیستم راست‌چین */
+            transform: scale(calc(1 / var(--zoom-scale, 1))); 
         }
 
-        html[dir="rtl"] .crop-header { right: 0; }
-        html[dir="ltr"] .crop-header { left: 0; }
+        html[dir="rtl"] .crop-header { right: 0; left: auto; transform-origin: bottom right; }
+        html[dir="ltr"] .crop-header { left: 0; right: auto; transform-origin: bottom left; }
 
+        /* حذف استایل‌های اسکیل تکی برای جلوگیری از تداخل */
         .crop-number {
             background: var(--primary);
             color: white;
-            font-size: 9px;
-            padding: 1px 4px;
-            border-radius: 2px;
+            font-size: 10px;
+            padding: 2px 5px;
+            border-radius: 4px;
             font-weight: bold;
+            line-height: 1;
+            display: inline-block;
+            white-space: nowrap;
         }
 
         .crop-delete {
             background: var(--danger);
             color: white;
             border: none;
-            width: 15px;
-            height: 15px;
-            border-radius: 2px;
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 10px;
+            font-size: 11px;
             display: flex;
             align-items: center;
             justify-content: center;
+            line-height: 1;
+            font-weight: bold;
         }
 
+        /* اصلاح دستگیره تغییر سایز گوشه بلاک */
         .resize-handle {
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
             background-color: #fff;
-            border: 1px solid var(--primary);
+            border: 1.5px solid var(--primary);
             border-radius: 50%;
             position: absolute;
-            bottom: -4px;
+            bottom: 0;
             cursor: nwse-resize;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            z-index: 5;
+            transform-origin: center center;
+            transform: translate(50%, 50%) scale(calc(1 / var(--zoom-scale, 1)));
         }
-        html[dir="rtl"] .resize-handle { left: -4px; }
-        html[dir="ltr"] .resize-handle { right: -4px; }
+
+        html[dir="rtl"] .resize-handle { left: 0; right: auto; transform: translate(-50%, 50%) scale(calc(1 / var(--zoom-scale, 1))); }
+        html[dir="ltr"] .resize-handle { right: 0; left: auto; transform: translate(50%, 50%) scale(calc(1 / var(--zoom-scale, 1))); }
 
         /* Guide Lines */
         .guide-line {
@@ -291,28 +307,20 @@
         }
 
         .guide-line.vertical {
-            width: 2px;
+            width: calc(2px / var(--zoom-scale, 1));
             height: 100%;
             cursor: col-resize;
             top: 0;
-            margin-left: -1px;
+            margin-left: calc(-1px / var(--zoom-scale, 1));
         }
 
         .guide-line.horizontal {
-            height: 2px;
+            height: calc(2px / var(--zoom-scale, 1));
             width: 100%;
             cursor: row-resize;
             left: 0;
-            margin-top: -1px;
+            margin-top: calc(-1px / var(--zoom-scale, 1));
         }
-
-        .guide-line::before {
-            content: '';
-            position: absolute;
-            background: transparent;
-        }
-        .guide-line.vertical::before { width: 12px; height: 100%; left: -5px; top: 0; }
-        .guide-line.horizontal::before { height: 12px; width: 100%; top: -5px; left: 0; }
 
         /* Floating Controls */
         .floating-controls {
@@ -429,7 +437,7 @@
         }
     </style>
 </head>
-<body class="pixel-perfect">
+<body class="pixel-perfect dark-mode">
 
     <!-- Toolbar -->
     <div class="toolbar">
@@ -457,6 +465,16 @@
                     <option value="image/jpeg">JPEG</option>
                     <option value="image/webp">WEBP</option>
                 </select>
+            </div>
+        </div>
+
+        <!-- Custom Box Dimensions Panel -->
+        <div class="tool-panel">
+            <div class="input-group">
+                <label data-i18n="boxSize">اندازه کادر:</label>
+                <input type="number" id="box-width" class="input-size" placeholder="W" value="32" min="1">
+                <span>×</span>
+                <input type="number" id="box-height" class="input-size" placeholder="H" value="32" min="1">
             </div>
         </div>
 
@@ -506,7 +524,7 @@
             </button>
 
             <button class="btn-icon" id="lang-toggle">🌐 EN</button>
-            <button class="btn-icon" id="theme-toggle">🌙</button>
+            <button class="btn-icon" id="theme-toggle">☀️</button>
         </div>
     </div>
 
@@ -560,12 +578,12 @@
                     const nameBytes = new TextEncoder().encode(file.name);
                     const header = new Uint8Array(30 + nameBytes.length);
                     const view = new DataView(header.buffer);
-                    view.setUint32(0, 0x04034b50, true); // Sign
-                    view.setUint16(6, 0, true); // Flags
-                    view.setUint16(8, 0, true); // Compression (Store)
-                    view.setUint32(18, file.data.length, true); // Compressed size
-                    view.setUint32(22, file.data.length, true); // Uncompressed size
-                    view.setUint16(26, nameBytes.length, true); // Name len
+                    view.setUint32(0, 0x04034b50, true);
+                    view.setUint16(6, 0, true);
+                    view.setUint16(8, 0, true);
+                    view.setUint32(18, file.data.length, true);
+                    view.setUint32(22, file.data.length, true);
+                    view.setUint16(26, nameBytes.length, true);
                     header.set(nameBytes, 30);
 
                     const cdHeader = new Uint8Array(46 + nameBytes.length);
@@ -574,8 +592,8 @@
                     cdView.setUint16(10, 0, true);
                     cdView.setUint32(20, file.data.length, true);
                     cdView.setUint32(24, file.data.length, true);
-                    cdView.setUint16(28, nameBytes.length, true);
-                    cdView.setUint32(42, offset, true);
+                    view.setUint16(28, nameBytes.length, true);
+                    view.setUint32(42, offset, true);
                     cdHeader.set(nameBytes, 46);
 
                     fileHeaders.push(cdHeader);
@@ -619,8 +637,9 @@
                 cropMode: "برش",
                 dropHint: "تصویر Asset Pack پیکسلی خود را کشیده و رها کنید",
                 bottomHint: "💡 اکنون می‌توانید با ساخت هوشمند خطوط بر اساس ابعاد شبکه، برش‌های فوق‌العاده دقیقی انجام دهید.",
-                previewTitle: "پیش‌نمایش قطعات برش‌خورده",
+                previewTitle: "Cropped Sections Preview",
                 alertNoImg: "لطفاً تصویری انتخاب کرده و حداقل یک کادر روی آن مشخص کنید.",
+                boxSize: "اندازه کادر:",
             },
             en: {
                 selectImage: "Select Image",
@@ -644,6 +663,7 @@
                 bottomHint: "💡 Smart Asset Detection algorithm and Full Offline Mode activated.",
                 previewTitle: "Cropped Sections Preview",
                 alertNoImg: "Please load an image and create at least one crop box.",
+                boxSize: "Box Size:",
             }
         };
 
@@ -691,6 +711,8 @@
         const previewModal = document.getElementById('preview-modal');
         const closeModalBtn = document.getElementById('close-modal');
         const modalGrid = document.getElementById('modal-grid');
+        const boxWidthInput = document.getElementById('box-width');
+        const boxHeightInput = document.getElementById('box-height');
 
         let boxes = [];
         let guideLines = [];
@@ -713,6 +735,16 @@
             document.body.classList.toggle('pixel-perfect');
             btnPixelPerfect.classList.toggle('active');
         });
+
+        // Theme Toggle (Default Dark Mode)
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        if (savedTheme === 'light') {
+            document.body.classList.remove('dark-mode');
+            themeToggleBtn.innerText = '🌙';
+        } else {
+            document.body.classList.add('dark-mode');
+            themeToggleBtn.innerText = '☀️';
+        }
 
         themeToggleBtn.addEventListener('click', () => {
             document.body.classList.toggle('dark-mode');
@@ -760,6 +792,9 @@
             if ((e.code === 'Delete' || e.code === 'Backspace') && selectedBox && e.target.tagName !== 'INPUT') {
                 removeBox(selectedBox);
             }
+            if ((e.ctrlKey || e.metaKey) && e.key === 'z' && boxes.length > 0 && e.target.tagName !== 'INPUT') {
+                removeBox(boxes[boxes.length - 1]);
+            }
         });
 
         window.addEventListener('keyup', (e) => {
@@ -779,6 +814,7 @@
                     imageWrapper.style.display = 'block';
                     resetZoom();
                     clearBoxes();
+                    boxCounter = 0;
                 };
             };
             reader.readAsDataURL(file);
@@ -796,19 +832,24 @@
 
         function updateTransform() {
             imageWrapper.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+            imageWrapper.style.setProperty('--zoom-scale', scale);
             document.getElementById('zoom-level').innerText = `${Math.round(scale * 100)}%`;
         }
 
         function resetZoom() {
             if (!img.clientWidth) return;
-            scale = 1;
-            panX = (viewport.clientWidth - img.clientWidth) / 2;
-            panY = (viewport.clientHeight - img.clientHeight) / 2;
+            if (img.naturalWidth < 300 || img.naturalHeight < 300) {
+                scale = Math.min(Math.floor(viewport.clientWidth / img.naturalWidth / 1.5), 8) || 1;
+            } else {
+                scale = 1;
+            }
+            panX = (viewport.clientWidth - img.clientWidth * scale) / 2;
+            panY = (viewport.clientHeight - img.clientHeight * scale) / 2;
             updateTransform();
         }
 
         function zoomAtPoint(newScale, clientX, clientY) {
-            newScale = Math.min(Math.max(0.15, newScale), 15);
+            newScale = Math.min(Math.max(0.15, newScale), 35); 
             const rect = viewport.getBoundingClientRect();
             const mouseX = clientX - rect.left;
             const mouseY = clientY - rect.top;
@@ -864,10 +905,21 @@
             if (e.button === 0) isToolPanning = false;
         });
 
-        // Box Creation
+        // Box Creation & Dimension Sync
         let isDrawingBox = false;
         let drawStartX = 0, drawStartY = 0;
         let currentDrawingBox = null;
+
+        boxWidthInput.addEventListener('input', updateSelectedBoxDimensions);
+        boxHeightInput.addEventListener('input', updateSelectedBoxDimensions);
+
+        function updateSelectedBoxDimensions() {
+            if (!selectedBox) return;
+            const w = parseInt(boxWidthInput.value, 10);
+            const h = parseInt(boxHeightInput.value, 10);
+            if (w > 0) selectedBox.element.style.width = `${Math.min(w, img.clientWidth - selectedBox.element.offsetLeft)}px`;
+            if (h > 0) selectedBox.element.style.height = `${Math.min(h, img.clientHeight - selectedBox.element.offsetTop)}px`;
+        }
 
         viewport.addEventListener('mousedown', (e) => {
             if (!img.src || activeTool !== 'crop' || isSpacePressed || e.button !== 0) return;
@@ -901,19 +953,25 @@
             currentDrawingBox.element.style.height = `${height}px`;
             currentDrawingBox.element.style.left = `${left}px`;
             currentDrawingBox.element.style.top = `${top}px`;
+
+            boxWidthInput.value = Math.round(width);
+            boxHeightInput.value = Math.round(height);
         });
 
         window.addEventListener('mouseup', () => {
             if (isDrawingBox) {
                 isDrawingBox = false;
                 if (currentDrawingBox) {
-                    const w = parseInt(currentDrawingBox.element.style.width, 10);
-                    const h = parseInt(currentDrawingBox.element.style.height, 10);
-                    if (w < 4 || h < 4) {
-                        let left = Math.min(drawStartX, img.clientWidth - 16);
-                        let top = Math.min(drawStartY, img.clientHeight - 16);
-                        currentDrawingBox.element.style.width = `16px`;
-                        currentDrawingBox.element.style.height = `16px`;
+                    let w = parseInt(currentDrawingBox.element.style.width, 10);
+                    let h = parseInt(currentDrawingBox.element.style.height, 10);
+
+                    if (w < 2 || h < 2) {
+                        const targetW = parseInt(boxWidthInput.value, 10) || 32;
+                        const targetH = parseInt(boxHeightInput.value, 10) || 32;
+                        let left = Math.min(drawStartX, img.clientWidth - targetW);
+                        let top = Math.min(drawStartY, img.clientHeight - targetH);
+                        currentDrawingBox.element.style.width = `${targetW}px`;
+                        currentDrawingBox.element.style.height = `${targetH}px`;
                         currentDrawingBox.element.style.left = `${Math.max(0, left)}px`;
                         currentDrawingBox.element.style.top = `${Math.max(0, top)}px`;
                     }
@@ -972,7 +1030,11 @@
         function selectBox(boxData) {
             boxes.forEach(b => b.element.classList.remove('selected'));
             selectedBox = boxData;
-            if (boxData) boxData.element.classList.add('selected');
+            if (boxData) {
+                boxData.element.classList.add('selected');
+                boxWidthInput.value = Math.round(parseInt(boxData.element.style.width, 10));
+                boxHeightInput.value = Math.round(parseInt(boxData.element.style.height, 10));
+            }
         }
 
         function removeBox(boxData) {
@@ -1075,7 +1137,7 @@
                     const w = xCoords[j + 1] - x;
                     const h = yCoords[i + 1] - y;
 
-                    if (w > 2 && h > 2) {
+                    if (w > 1 && h > 1) {
                         boxCounter++;
                         createBox(x, y, w, h, boxCounter);
                     }
@@ -1099,7 +1161,7 @@
             }
         });
 
-        // REFACTORED SMART DETECT ALGORITHM (OPTIMIZED & FREEZE-FREE)
+        // FIXED SMART DETECT ALGORITHM (With Blur & Sensitivity Scaling)
         btnSmartDetect.addEventListener('click', () => {
             if (!img.src) return;
             clearBoxes();
@@ -1111,22 +1173,26 @@
             const h = img.naturalHeight;
             canvas.width = w;
             canvas.height = h;
+
+            // تکنیک اول: مات کردن پیکسلی تصویر برای متصل کردن لبه‌های متن به هم و فیلتر نویزها
+            ctx.filter = 'blur(4px) grayscale(100%)';
             ctx.drawImage(img, 0, 0);
 
             const imageData = ctx.getImageData(0, 0, w, h);
             const data = imageData.data;
 
-            // Background Reference Colors (Corners Averaging for dynamic BG)
             const bgR = data[0], bgG = data[1], bgB = data[2], bgA = data[3];
-
-            // Sens Threshold Formula Fix
             const threshold = (101 - sens) * 3.5; 
+
+            // تکنیک دوم: تبدیل غیرخطی حساسیت به حداقل مساحت مجاز کادر (Min Area)
+            // هر چه حساسیت کمتر باشد، کادرهای کوچک و متون بیشتر فیلتر می‌شوند
+            const minArea = ((100 - sens) / 100) * 4500 + 15;
 
             function isForegroundPixel(x, y) {
                 const idx = (y * w + x) * 4;
                 const r = data[idx], g = data[idx+1], b = data[idx+2], a = data[idx+3];
                 
-                if (bgA < 20) return a > 30; // Alpha mode
+                if (bgA < 20) return a > 30;
 
                 const diffR = r - bgR;
                 const diffG = g - bgG;
@@ -1137,12 +1203,12 @@
             }
 
             const visited = new Uint8Array(w * h);
-            const foundBoxes = [];
+            let foundBoxes = [];
             const displayScaleX = img.clientWidth / w;
             const displayScaleY = img.clientHeight / h;
 
-            for (let y = 0; y < h; y++) {
-                for (let x = 0; x < w; x++) {
+            for (let y = 0; y < h; y += 2) { // بهینه‌سازی سرعت اسکن
+                for (let x = 0; x < w; x += 2) {
                     const pixelIdx = y * w + x;
                     if (!visited[pixelIdx] && isForegroundPixel(x, y)) {
                         let minX = x, maxX = x, minY = y, maxY = y;
@@ -1161,10 +1227,10 @@
                             if (cy > maxY) maxY = cy;
 
                             const neighbors = [
-                                cx + 1, cy,
-                                cx - 1, cy,
-                                cx, cy + 1,
-                                cx, cy - 1
+                                cx + 2, cy,
+                                cx - 2, cy,
+                                cx, cy + 2,
+                                cx, cy - 2
                             ];
 
                             for (let i = 0; i < neighbors.length; i += 2) {
@@ -1182,9 +1248,10 @@
 
                         const boxW = (maxX - minX + 1);
                         const boxH = (maxY - minY + 1);
+                        const area = boxW * boxH;
 
-                        // Prevent freezes by discarding noise/tiny boxes (< 6px or <= 12 total pixels)
-                        if (boxW >= 6 && boxH >= 6 && pixelCount >= 12) {
+                        // بررسی کادر بر اساس فیلتر مساحت به دست آمده از حساسیت اسلایدر
+                        if (boxW >= 4 && boxH >= 4 && area >= minArea) {
                             foundBoxes.push({
                                 x: minX * displayScaleX,
                                 y: minY * displayScaleY,
@@ -1196,11 +1263,46 @@
                 }
             }
 
+            // ترکیب خودکار کادرهایی که بیش از حد به هم نزدیک هستند (مثلاً لایه‌های کلمات یک متن)
+            foundBoxes = mergeCloseBoxes(foundBoxes, 12);
+
             foundBoxes.forEach(b => {
                 boxCounter++;
                 createBox(b.x, b.y, b.w, b.h, boxCounter);
             });
         });
+
+        function mergeCloseBoxes(boxesList, padding) {
+            let change = true;
+            while (change) {
+                change = false;
+                for (let i = 0; i < boxesList.length; i++) {
+                    for (let j = i + 1; j < boxesList.length; j++) {
+                        const b1 = boxesList[i];
+                        const b2 = boxesList[j];
+
+                        if (b1.x - padding < b2.x + b2.w &&
+                            b1.x + b1.w + padding > b2.x &&
+                            b1.y - padding < b2.y + b2.h &&
+                            b1.y + b1.h + padding > b2.y) {
+                            
+                            const minX = Math.min(b1.x, b2.x);
+                            const minY = Math.min(b1.y, b2.y);
+                            b1.w = Math.max(b1.x + b1.w, b2.x + b2.w) - minX;
+                            b1.h = Math.max(b1.y + b1.h, b2.y + b2.h) - minY;
+                            b1.x = minX;
+                            b1.y = minY;
+
+                            boxesList.splice(j, 1);
+                            change = true;
+                            break;
+                        }
+                    }
+                    if (change) break;
+                }
+            }
+            return boxesList;
+        }
 
         // Draggable & Resizable Fixes
         function makeDraggable(boxData) {
@@ -1253,11 +1355,18 @@
                 const dx = (e.clientX - startX) / scale;
                 const dy = (e.clientY - startY) / scale;
 
-                let newWidth = Math.max(4, startWidth + dx);
-                element.style.width = `${Math.min(newWidth, img.clientWidth - startLeft)}px`;
+                let newWidth = Math.max(1, startWidth + dx);
+                let finalWidth = Math.min(newWidth, img.clientWidth - startLeft);
+                element.style.width = `${finalWidth}px`;
 
-                let newHeight = Math.max(4, startHeight + dy);
-                element.style.height = `${Math.min(newHeight, img.clientHeight - element.offsetTop)}px`;
+                let newHeight = Math.max(1, startHeight + dy);
+                let finalHeight = Math.min(newHeight, img.clientHeight - element.offsetTop);
+                element.style.height = `${finalHeight}px`;
+
+                if (selectedBox === boxData) {
+                    boxWidthInput.value = Math.round(finalWidth);
+                    boxHeightInput.value = Math.round(finalHeight);
+                }
             });
 
             window.addEventListener('mouseup', () => { isResizing = false; });
@@ -1323,7 +1432,6 @@
                 return;
             }
 
-            // Fallback to offline SimpleZip if JSZip is not loaded
             const zip = window.JSZip ? new JSZip() : new SimpleZip();
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
