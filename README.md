@@ -56,3 +56,20 @@ Since this is a client-side web application, **no installation or build steps ar
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/SDDASHTI/Image-splitter.git
+
+
+## ❤️☕ Support / Donation
+
+If you find this project useful, you can support its development:
+
+- **Monero (XMR)** *(Preferred for privacy)*:
+8B7ukqcbMLdhDzLvUFVjQu3oHhK6SFAvtJt7BtvuqdcsFXicSBxQkSLdCzDaK7gRibUQHnXy3z2r5c3CSkghvckc1zbueVg
+
+- **Bitcoin (BTC)**:
+bc1qd4vs6srrc52mfwqvhhdr9yfpycxkn0362cg7w3
+
+- **Ethereum (ETH) / USDT (ERC-20 / BEP-20)**:
+0x9f55C92B05D7097443F0bADeF1BD3D6c657F9506
+
+- **GRAM Toncoin (GRAM)**:
+UQA3MKJZQc4XFQtUrFGkr0hTA0VMedbYDj6a4jyDp71dEwxr
