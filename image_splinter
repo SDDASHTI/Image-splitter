@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" id="html-root">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Splitter Pro - ابزار حرفه‌ای برش تصویر</title>
+    <!-- Vazirmatn Font -->
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <!-- JSZip Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --panel-bg: rgba(255, 255, 255, 0.88);
+            --panel-border: rgba(226, 232, 240, 0.9);
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --danger: #ef4444;
+            --danger-hover: #dc2626;
+            --success: #10b981;
+            --success-hover: #059669;
+            --box-border: #6366f1;
+            --box-bg: rgba(99, 102, 241, 0.2);
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            --radius: 12px;
+        }
+
+        body.dark-mode {
+            --bg-color: #0f172a;
+            --panel-bg: rgba(30, 41, 59, 0.88);
+            --panel-border: rgba(51, 65, 85, 0.9);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #818cf8;
+            --primary-hover: #6366f1;
+            --box-border: #38bdf8;
+            --box-bg: rgba(56, 189, 248, 0.25);
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .toolbar {
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--panel-border);
+            padding: 16px 20px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+            max-width: 1300px;
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .tool-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        input[type="number"], input[type="text"], select {
+            background: var(--bg-color);
+            color: var(--text-main);
+            border: 1px solid var(--panel-border);
+            padding: 7px 10px;
+            border-radius: 8px;
+            outline: none;
+            font-size: 13px;
+        }
+
+        input[type="number"] { width: 70px; text-align: center; }
+        input[type="text"] { width: 100px; }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+            user-select: none;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn:active { transform: translateY(0); }
+        .btn-success { background-color: var(--success); }
+        .btn-success:hover { background-color: var(--success-hover); }
+        .btn-danger { background-color: var(--danger); }
+        .btn-danger:hover { background-color: var(--danger-hover); }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--panel-border);
+        }
+        .btn-outline:hover {
+            background: var(--panel-border);
+        }
+        .btn-outline.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .btn-icon {
+            padding: 8px 10px;
+            border-radius: 8px;
+            background: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--panel-border);
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn-icon:hover { background: var(--panel-border); }
+
+        input[type="file"] { display: none; }
+
+        /* Viewport & Canvas Area */
+        .viewport {
+            width: 100%;
+            max-width: 1300px;
+            height: 72vh;
+            background: var(--panel-bg);
+            border: 2px dashed var(--panel-border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow);
+            user-select: none;
+        }
+
+        .viewport.drag-over {
+            border-color: var(--primary);
+            background: var(--box-bg);
+        }
+
+        .viewport.mode-pan { cursor: grab !important; }
+        .viewport.mode-pan:active { cursor: grabbing !important; }
+        .viewport.mode-crop { cursor: crosshair; }
+
+        #image-wrapper {
+            position: absolute;
+            transform-origin: 0 0;
+            top: 0;
+            left: 0;
+        }
+
+        #image {
+            display: block;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .placeholder-text {
+            color: var(--text-muted);
+            text-align: center;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding: 20px;
+        }
+
+        /* Crop Boxes */
+        .crop-box {
+            position: absolute;
+            border: 2px solid var(--box-border);
+            background-color: var(--box-bg);
+            backdrop-filter: blur(2px);
+            border-radius: 6px;
+            cursor: move;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .crop-header {
+            position: absolute;
+            top: -28px;
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        html[dir="rtl"] .crop-header { right: 0; }
+        html[dir="ltr"] .crop-header { left: 0; }
+
+        .crop-number {
+            background: var(--primary);
+            color: white;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .crop-delete {
+            background: var(--danger);
+            color: white;
+            border: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .crop-delete:hover { background: var(--danger-hover); }
+
+        .resize-handle {
+            width: 14px;
+            height: 14px;
+            background-color: #fff;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            position: absolute;
+            bottom: -7px;
+            cursor: nwse-resize;
+        }
+        html[dir="rtl"] .resize-handle { left: -7px; }
+        html[dir="ltr"] .resize-handle { right: -7px; }
+
+        /* Floating Controls */
+        .floating-controls {
+            position: absolute;
+            bottom: 16px;
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            backdrop-filter: blur(8px);
+            border-radius: 30px;
+            padding: 6px 14px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            box-shadow: var(--shadow);
+            z-index: 10;
+        }
+
+        html[dir="rtl"] .floating-controls { left: 16px; }
+        html[dir="ltr"] .floating-controls { right: 16px; }
+
+        .floating-controls span {
+            font-size: 12px;
+            font-weight: bold;
+            min-width: 45px;
+            text-align: center;
+        }
+
+        .hint-bar {
+            margin-top: 10px;
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+        <div class="tool-group">
+            <label for="upload" class="btn">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                <span data-i18n="selectImage">انتخاب تصویر</span>
+            </label>
+            <input type="file" id="upload" accept="image/*">
+
+            <div class="input-group">
+                <label data-i18n="prefix">پیشوند/نام:</label>
+                <input type="text" id="prefix-input" value="w">
+            </div>
+
+            <div class="input-group">
+                <label data-i18n="startIndex">شماره شروع:</label>
+                <input type="number" id="start-index" value="1" min="1">
+            </div>
+
+            <div class="input-group">
+                <label data-i18n="format">فرمت:</label>
+                <select id="export-format">
+                    <option value="image/png">PNG</option>
+                    <option value="image/jpeg">JPEG</option>
+                    <option value="image/webp">WEBP</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="tool-group">
+            <button class="btn btn-outline" id="mode-toggle" title="حالت حرکت / انتخاب">
+                <span id="mode-icon">🖐️</span> <span id="mode-text" data-i18n="panMode">حالت جابه‌جایی</span>
+            </button>
+
+            <button class="btn btn-danger" id="clear-btn" data-i18n="clear">پاک‌سازی</button>
+            <button class="btn btn-success" id="export-btn">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                <span data-i18n="exportZip">دانلود ZIP</span>
+            </button>
+
+            <button class="btn-icon" id="lang-toggle" title="English / فارسی">🌐 EN</button>
+            <button class="btn-icon" id="theme-toggle" title="Theme">🌙</button>
+        </div>
+    </div>
+
+    <!-- Viewport -->
+    <div class="viewport mode-crop" id="viewport">
+        <div class="placeholder-text" id="placeholder">
+            <svg width="52" height="52" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            <p data-i18n="dropHint">تصویر را اینجا بکشید و رها کنید یا روی «انتخاب تصویر» کلیک کنید</p>
+        </div>
+
+        <div id="image-wrapper" style="display: none;">
+            <img id="image" alt="Uploaded Image">
+        </div>
+
+        <!-- Zoom Floating Controls -->
+        <div class="floating-controls">
+            <button class="btn-icon" id="zoom-out" style="border:none; padding:2px 6px;">-</button>
+            <span id="zoom-level">100%</span>
+            <button class="btn-icon" id="zoom-in" style="border:none; padding:2px 6px;">+</button>
+            <button class="btn-icon" id="zoom-reset" style="border:none; padding:2px 6px;" title="Reset Zoom">↺</button>
+        </div>
+    </div>
+
+    <div class="hint-bar" data-i18n="bottomHint">
+        💡 راهنما: با کلیک وسط موس (Scroll Wheel) یا فعال‌سازی «حالت جابه‌جایی» می‌توانید روی تصویر زوم‌شده حرکت کنید.
+    </div>
+
+    <script>
+        // Translations
+        const i18n = {
+            fa: {
+                selectImage: "انتخاب تصویر",
+                prefix: "پیشوند/نام:",
+                startIndex: "شماره شروع:",
+                format: "فرمت:",
+                clear: "پاک‌سازی",
+                exportZip: "دانلود ZIP",
+                panMode: "حالت جابه‌جایی",
+                cropMode: "حالت برش",
+                dropHint: "تصویر را اینجا بکشید و رها کنید یا روی «انتخاب تصویر» کلیک کنید",
+                bottomHint: "💡 راهنما: با کلیک وسط موس (Scroll Wheel) یا فعال‌سازی «حالت جابه‌جایی» می‌توانید روی تصویر زوم‌شده حرکت کنید.",
+                alertNoImg: "لطفاً تصویری انتخاب کرده و حداقل یک مربع روی آن مشخص کنید.",
+            },
+            en: {
+                selectImage: "Select Image",
+                prefix: "Prefix/Name:",
+                startIndex: "Start Index:",
+                format: "Format:",
+                clear: "Clear All",
+                exportZip: "Export ZIP",
+                panMode: "Pan Tool",
+                cropMode: "Crop Tool",
+                dropHint: "Drag & Drop image here or click 'Select Image'",
+                bottomHint: "💡 Hint: Use Middle Mouse Button drag or activate 'Pan Tool' to move zoomed image.",
+                alertNoImg: "Please load an image and create at least one crop box.",
+            }
+        };
+
+        let currentLang = localStorage.getItem('lang') || 'en';
+
+        function applyLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('lang', lang);
+            const htmlRoot = document.getElementById('html-root');
+            htmlRoot.setAttribute('lang', lang);
+            htmlRoot.setAttribute('dir', lang === 'fa' ? 'rtl' : 'ltr');
+            document.getElementById('lang-toggle').innerText = lang === 'fa' ? '🌐 EN' : '🌐 FA';
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18n[lang][key]) {
+                    el.innerText = i18n[lang][key];
+                }
+            });
+            updateModeUI();
+        }
+
+        // Elements
+        const uploadInput = document.getElementById('upload');
+        const img = document.getElementById('image');
+        const imageWrapper = document.getElementById('image-wrapper');
+        const viewport = document.getElementById('viewport');
+        const placeholder = document.getElementById('placeholder');
+        const exportBtn = document.getElementById('export-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const startIndexInput = document.getElementById('start-index');
+        const prefixInput = document.getElementById('prefix-input');
+        const exportFormatSelect = document.getElementById('export-format');
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const langToggleBtn = document.getElementById('lang-toggle');
+        const modeToggleBtn = document.getElementById('mode-toggle');
+
+        let boxes = [];
+        let boxCounter = 0;
+        let scale = 1;
+        let panX = 0, panY = 0;
+        let activeTool = 'crop'; // 'crop' or 'pan'
+        let isMiddlePanning = false;
+        let isToolPanning = false;
+        let panStartX = 0, panStartY = 0;
+
+        // Theme Toggle
+        themeToggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            themeToggleBtn.innerText = isDark ? '☀️' : '🌙';
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+            themeToggleBtn.innerText = '☀️';
+        }
+
+        // Language Toggle
+        langToggleBtn.addEventListener('click', () => {
+            applyLanguage(currentLang === 'fa' ? 'en' : 'fa');
+        });
+
+        // Mode Toggle (Crop / Pan)
+        function updateModeUI() {
+            const modeIcon = document.getElementById('mode-icon');
+            const modeText = document.getElementById('mode-text');
+            if (activeTool === 'pan') {
+                modeToggleBtn.classList.add('active');
+                viewport.classList.remove('mode-crop');
+                viewport.classList.add('mode-pan');
+                modeIcon.innerText = '✂️';
+                modeText.innerText = i18n[currentLang].cropMode;
+            } else {
+                modeToggleBtn.classList.remove('active');
+                viewport.classList.remove('mode-pan');
+                viewport.classList.add('mode-crop');
+                modeIcon.innerText = '🖐️';
+                modeText.innerText = i18n[currentLang].panMode;
+            }
+        }
+
+        modeToggleBtn.addEventListener('click', () => {
+            activeTool = activeTool === 'crop' ? 'pan' : 'crop';
+            updateModeUI();
+        });
+
+        // Load Image File
+        function loadImageFile(file) {
+            if (!file || !file.type.startsWith('image/')) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                img.src = e.target.result;
+                img.onload = () => {
+                    placeholder.style.display = 'none';
+                    imageWrapper.style.display = 'block';
+                    resetZoom();
+                    clearBoxes();
+                };
+            };
+            reader.readAsDataURL(file);
+        }
+
+        uploadInput.addEventListener('change', (e) => loadImageFile(e.target.files[0]));
+
+        // Drag & Drop
+        viewport.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            viewport.classList.add('drag-over');
+        });
+        viewport.addEventListener('dragleave', () => viewport.classList.remove('drag-over'));
+        viewport.addEventListener('drop', (e) => {
+            e.preventDefault();
+            viewport.classList.remove('drag-over');
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                loadImageFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        // Zoom & Pan Engine
+        function updateTransform() {
+            imageWrapper.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+            document.getElementById('zoom-level').innerText = `${Math.round(scale * 100)}%`;
+        }
+
+        function resetZoom() {
+            scale = 1;
+            panX = (viewport.clientWidth - img.clientWidth) / 2;
+            panY = (viewport.clientHeight - img.clientHeight) / 2;
+            updateTransform();
+        }
+
+        document.getElementById('zoom-in').addEventListener('click', () => { scale = Math.min(scale + 0.15, 5); updateTransform(); });
+        document.getElementById('zoom-out').addEventListener('click', () => { scale = Math.max(scale - 0.15, 0.2); updateTransform(); });
+        document.getElementById('zoom-reset').addEventListener('click', resetZoom);
+
+        viewport.addEventListener('wheel', (e) => {
+            if (!img.src) return;
+            e.preventDefault();
+            const delta = e.deltaY < 0 ? 0.1 : -0.1;
+            scale = Math.min(Math.max(0.2, scale + delta), 5);
+            updateTransform();
+        }, { passive: false });
+
+        // Middle Mouse & Pan Mode Handling
+        viewport.addEventListener('mousedown', (e) => {
+            if (!img.src) return;
+
+            // Middle Mouse Click (button 1) OR Pan Tool Active (button 0)
+            if (e.button === 1 || (activeTool === 'pan' && e.button === 0)) {
+                e.preventDefault();
+                if (e.button === 1) isMiddlePanning = true;
+                if (activeTool === 'pan' && e.button === 0) isToolPanning = true;
+                panStartX = e.clientX - panX;
+                panStartY = e.clientY - panY;
+            }
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (isMiddlePanning || isToolPanning) {
+                panX = e.clientX - panStartX;
+                panY = e.clientY - panStartY;
+                updateTransform();
+            }
+        });
+
+        window.addEventListener('mouseup', (e) => {
+            if (e.button === 1) isMiddlePanning = false;
+            if (e.button === 0) isToolPanning = false;
+        });
+
+        // Create Crop Box
+        viewport.addEventListener('click', (e) => {
+            if (!img.src || activeTool !== 'crop' || e.button !== 0) return;
+            if (e.target !== viewport && e.target !== imageWrapper && e.target !== img) return;
+
+            const rect = imageWrapper.getBoundingClientRect();
+            const clickX = (e.clientX - rect.left) / scale;
+            const clickY = (e.clientY - rect.top) / scale;
+
+            const defaultSize = 120;
+            boxCounter++;
+            createBox(clickX, clickY, defaultSize, defaultSize, boxCounter);
+        });
+
+        function createBox(x, y, width, height, number) {
+            const box = document.createElement('div');
+            box.className = 'crop-box';
+            box.style.width = `${width}px`;
+            box.style.height = `${height}px`;
+            box.style.left = `${x}px`;
+            box.style.top = `${y}px`;
+
+            const header = document.createElement('div');
+            header.className = 'crop-header';
+
+            const numLabel = document.createElement('span');
+            numLabel.className = 'crop-number';
+            numLabel.innerText = `#${number}`;
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'crop-delete';
+            deleteBtn.innerHTML = '✕';
+            deleteBtn.onclick = (e) => {
+                e.stopPropagation();
+                removeBox(boxData);
+            };
+
+            header.appendChild(numLabel);
+            header.appendChild(deleteBtn);
+            box.appendChild(header);
+
+            const handle = document.createElement('div');
+            handle.className = 'resize-handle';
+            box.appendChild(handle);
+
+            imageWrapper.appendChild(box);
+
+            const boxData = { element: box, id: number };
+            boxes.push(boxData);
+
+            makeDraggable(box);
+            makeResizable(box, handle);
+        }
+
+        function removeBox(boxData) {
+            boxData.element.remove();
+            boxes = boxes.filter(b => b !== boxData);
+        }
+
+        function clearBoxes() {
+            boxes.forEach(b => b.element.remove());
+            boxes = [];
+            boxCounter = 0;
+        }
+
+        clearBtn.addEventListener('click', clearBoxes);
+
+        function makeDraggable(element) {
+            let isDragging = false;
+            let startX, startY, initialLeft, initialTop;
+
+            element.addEventListener('mousedown', (e) => {
+                if (activeTool === 'pan' || e.button !== 0) return;
+                if (e.target.classList.contains('resize-handle') || e.target.classList.contains('crop-delete')) return;
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                initialLeft = element.offsetLeft;
+                initialTop = element.offsetTop;
+                e.stopPropagation();
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                const dx = (e.clientX - startX) / scale;
+                const dy = (e.clientY - startY) / scale;
+
+                let newLeft = Math.max(0, Math.min(initialLeft + dx, img.clientWidth - element.clientWidth));
+                let newTop = Math.max(0, Math.min(initialTop + dy, img.clientHeight - element.clientHeight));
+
+                element.style.left = `${newLeft}px`;
+                element.style.top = `${newTop}px`;
+            });
+
+            window.addEventListener('mouseup', () => { isDragging = false; });
+        }
+
+        function makeResizable(element, handle) {
+            let isResizing = false;
+            let startX, startY, startWidth, startHeight;
+
+            handle.addEventListener('mousedown', (e) => {
+                if (e.button !== 0) return;
+                isResizing = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                startWidth = parseInt(document.defaultView.getComputedStyle(element).width, 10);
+                startHeight = parseInt(document.defaultView.getComputedStyle(element).height, 10);
+                e.stopPropagation();
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                if (!isResizing) return;
+                const isRtl = currentLang === 'fa';
+                const dx = (e.clientX - startX) / scale;
+                const dy = (e.clientY - startY) / scale;
+
+                const newWidth = Math.max(30, isRtl ? startWidth - dx : startWidth + dx);
+                const newHeight = Math.max(30, startHeight + dy);
+
+                element.style.width = `${newWidth}px`;
+                element.style.height = `${newHeight}px`;
+            });
+
+            window.addEventListener('mouseup', () => { isResizing = false; });
+        }
+
+        // Export ZIP
+        exportBtn.addEventListener('click', async () => {
+            if (boxes.length === 0 || !img.src) {
+                alert(i18n[currentLang].alertNoImg);
+                return;
+            }
+
+            const zip = new JSZip();
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            const scaleX = img.naturalWidth / img.clientWidth;
+            const scaleY = img.naturalHeight / img.clientHeight;
+
+            let startNum = parseInt(startIndexInput.value, 10) || 1;
+            const prefix = prefixInput.value.trim() || 'w';
+            const mimeType = exportFormatSelect.value;
+            const ext = mimeType.split('/')[1];
+
+            for (let i = 0; i < boxes.length; i++) {
+                const box = boxes[i].element;
+
+                const x = box.offsetLeft * scaleX;
+                const y = box.offsetTop * scaleY;
+                const width = box.clientWidth * scaleX;
+                const height = box.clientHeight * scaleY;
+
+                canvas.width = width;
+                canvas.height = height;
+
+                ctx.drawImage(img, x, y, width, height, 0, 0, width, height);
+
+                const dataUrl = canvas.toDataURL(mimeType, 0.95);
+                const base64Data = dataUrl.replace(new RegExp(`^data:${mimeType};base64,`), "");
+
+                const currentNum = startNum + i;
+                const formattedNum = String(currentNum).padStart(4, '0');
+                const fileName = `${prefix}${formattedNum}.${ext}`;
+
+                zip.file(fileName, base64Data, { base64: true });
+            }
+
+            startIndexInput.value = startNum + boxes.length;
+
+            const content = await zip.generateAsync({ type: "blob" });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(content);
+            link.download = `cropped_images_${Date.now()}.zip`;
+            link.click();
+        });
+
+        // Initialize i18n
+        applyLanguage(currentLang);
+    </script>
+</body>
+</html>
