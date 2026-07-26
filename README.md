@@ -18,44 +18,78 @@
 
 ---
 
-## 🌟 Overview
+# 🎨 Image Splitter
 
-**Web Image Splitter** is a lightweight, responsive client-side web application built with pure HTML5, CSS3, and JavaScript. It provides a fast and intuitive interface for slicing images into grids or precise tile dimensions right inside your browser. 
-
-Since all image processing happens locally using the **HTML5 Canvas API**, your images are processed instantly with **100% privacy** — no data is ever uploaded to an external server.
+> **A powerful, client-side web application for splitting pixel art, sprite sheets, and asset packs with ease.**
 
 ---
 
-## ✨ Key Features
+## 🌟 Key Features
 
-* **🔒 100% Client-Side & Private:** All processing is done locally via HTML5 Canvas. Your images never leave your browser.
-* **📐 Dual Splitting Modes:**
-  * **Grid Mode (Rows x Columns):** Slice images into equal matrix parts (e.g., 3x3 for Instagram grids).
-  * **Fixed Dimension Mode (Width x Height):** Split images into exact pixel sizes for sprite sheets or web assets.
-* **👁️ Real-Time Interactive Preview:** See grid lines overlaid on your uploaded image before exporting.
-* **📦 One-Click Batch Download:** Export all individual sliced tiles effortlessly (or as a bundled `.zip`).
-* **📱 Responsive & Drag-and-Drop UI:** Sleek, modern interface that works seamlessly on desktop and mobile devices.
-* **⚡ High Performance:** Ultra-fast rendering with lossless image quality output.
+### ✂️ Precision Crop & Grid Tools
+* **Manual Drag-and-Drop Crop:** Click and drag anywhere on the canvas to define custom selection boxes.
+* **Custom Dimension Panel:** Set exact width and height ($W \times H$) for selected boxes or default new ones.
+* **Batch Grid Split:** Automatically generate a uniform grid ($Columns \times Rows$) across the entire canvas with a single click.
+* **Interactive Guide Lines:** Place horizontal and vertical split lines on your image and instantly divide it into separate assets.
+
+### 🧠 Smart Asset Auto-Detection
+* **Intelligent Edge & Blob Detection:** Automatically scans your asset sheet, detects individual sprites, and wraps them in crop boxes.
+* **Adjustable Sensitivity Slider:** Fine-tune the detection algorithm for dense, transparent, or low-contrast sprite sheets.
+
+### ↩️ Full Undo & Redo History
+* **State Management:** Fully tracked history system for box creation, moving, resizing, and guide lines.
+* **Dedicated Controls:**
+  * **UI Buttons:** Dedicated Undo (`↩️`) and Redo (`↪️`) toolbar buttons.
+  * **Keyboard Shortcuts:** `Ctrl + Z` for Undo and `Ctrl + Y` (or `Ctrl + Shift + Z`) for Redo.
+
+### 👾 Pixel-Perfect Rendering
+* **Crisp Sprite Display:** Toggle Pixel-Perfect mode to keep retro pixel art sharp and clear without blurry interpolation.
+
+### 📱 Touch & Multi-Device Support
+* **Pointer Events Integration:** Smooth interaction across Desktop, Laptops, Mobile Devices, Tablets, and Stylus/Pens (`pointerdown`, `pointermove`, `pointerup`).
+
+### 📦 Flexible Export Options
+* **Individual File Downloads:** Preview cropped sections in a modal and download specific assets individually.
+* **Bulk ZIP Export:** Batch export all cropped sections into a single ZIP file with custom sequential naming (e.g., `asset0001.png`, `asset0002.png`).
+* **Format Support:** Export directly to **PNG**, **JPEG**, or **WEBP**.
+* **Offline ZIP Engine Engine:** Includes a lightweight, standalone JS ZIP fallback algorithm—works $100\%$ offline without requiring internet or external dependencies.
+
+### 🌐 Universal & Accessible UX
+* **Multilingual UI:** Toggle instantly between **Persian (RTL)** and **English (LTR)**.
+* **Dark / Light Theme:** Seamless switchable Dark and Light visual themes with setting persistence.
+* **Auto-Save Preferences:** Settings like prefix name, image format, pixel mode, and sensitivity are automatically remembered in `localStorage`.
 
 ---
 
-## 🛠️ Tech Stack
+## ⌨️ Hotkeys & Shortcuts
 
-* **Structure:** HTML5
-* **Styling:** CSS3 (Flexbox / CSS Grid / Custom Variables)
-* **Logic & Engine:** Vanilla JavaScript (ES6+) & HTML5 Canvas API
+| Action | Shortcut |
+| :--- | :--- |
+| **Undo** | `Ctrl + Z` |
+| **Redo** | `Ctrl + Y` or `Ctrl + Shift + Z` |
+| **Delete Selected Box** | `Delete` or `Backspace` |
+| **Pan Canvas** | Hold `Spacebar` + Drag Left Click |
+| **Zoom In / Out** | `Mouse Wheel` or UI Controls (`+` / `-`) |
 
 ---
 
-## 🚀 Getting Started
+## 🛠️ Built With
 
-Since this is a client-side web application, **no installation or build steps are required!**
+* **HTML5 Canvas & Vanilla JavaScript** (Zero heavy framework overhead)
+* **CSS Custom Properties** (For dynamic RTL/LTR and Dark/Light styling)
+* **JSZip API** (With an integrated offline fallback generator)
 
-### Running Locally
+---
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/SDDASHTI/Image-splitter.git
+## 🚀 Quick Start
+
+1. Download or clone the `index.html` file.
+2. Open `index.html` in any modern web browser (Chrome, Firefox, Edge, Safari).
+3. Drag & Drop your sprite sheet or click **Select Image** to get started!
+
+---
+
+<p center>Made for pixel artists, game developers, and designers. 🚀</p>
 
 
 ## ❤️☕ Support / Donation
