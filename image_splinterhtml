@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr" id="html-root">
+<html lang="fa" dir="rtl" id="html-root">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Splitter Pro - ابزار حرفه‌ای برش تصویر</title>
-    <!-- Vazirmatn Font -->
+    <title>Image Splitter v1.1</title>
+    <!-- Vazirmatn Font (CDN with system fallback) -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
-    <!-- JSZip Library -->
+    <!-- JSZip CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
         :root {
             --bg-color: #f8fafc;
-            --panel-bg: rgba(255, 255, 255, 0.88);
+            --panel-bg: rgba(255, 255, 255, 0.95);
             --panel-border: rgba(226, 232, 240, 0.9);
             --text-main: #0f172a;
             --text-muted: #64748b;
@@ -22,21 +22,21 @@
             --success: #10b981;
             --success-hover: #059669;
             --box-border: #6366f1;
-            --box-bg: rgba(99, 102, 241, 0.2);
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            --box-bg: rgba(99, 102, 241, 0.18);
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
             --radius: 12px;
         }
 
         body.dark-mode {
             --bg-color: #0f172a;
-            --panel-bg: rgba(30, 41, 59, 0.88);
+            --panel-bg: rgba(30, 41, 59, 0.95);
             --panel-border: rgba(51, 65, 85, 0.9);
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --primary: #818cf8;
             --primary-hover: #6366f1;
             --box-border: #38bdf8;
-            --box-bg: rgba(56, 189, 248, 0.25);
+            --box-bg: rgba(56, 189, 248, 0.22);
             --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
         }
 
@@ -45,7 +45,7 @@
             font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif;
             margin: 0;
             padding: 0;
-            transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
         }
 
         body {
@@ -55,22 +55,21 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px;
+            padding: 15px;
         }
 
         .toolbar {
             background: var(--panel-bg);
-            backdrop-filter: blur(12px);
             border: 1px solid var(--panel-border);
-            padding: 16px 20px;
+            padding: 12px 18px;
             border-radius: var(--radius);
             box-shadow: var(--shadow);
-            margin-bottom: 20px;
+            margin-bottom: 12px;
             display: flex;
-            gap: 16px;
+            gap: 12px;
             align-items: center;
             flex-wrap: wrap;
-            max-width: 1300px;
+            max-width: 1450px;
             width: 100%;
             justify-content: space-between;
         }
@@ -78,15 +77,25 @@
         .tool-group {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
+        }
+
+        .tool-panel {
+            background: rgba(99, 102, 241, 0.06);
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--panel-border);
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .input-group {
             display: flex;
             align-items: center;
-            gap: 6px;
-            font-size: 13px;
+            gap: 4px;
+            font-size: 12px;
             color: var(--text-muted);
             font-weight: 500;
         }
@@ -95,38 +104,35 @@
             background: var(--bg-color);
             color: var(--text-main);
             border: 1px solid var(--panel-border);
-            padding: 7px 10px;
-            border-radius: 8px;
+            padding: 5px 6px;
+            border-radius: 6px;
             outline: none;
             font-size: 13px;
+            font-weight: bold;
+            text-align: center;
         }
 
-        input[type="number"] { width: 70px; text-align: center; }
-        input[type="text"] { width: 100px; }
+        .input-size { width: 65px !important; }
+        .input-count { width: 50px !important; }
+        input[type="text"] { width: 75px; }
 
         .btn {
             background-color: var(--primary);
             color: white;
-            padding: 8px 16px;
+            padding: 6px 12px;
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
             transition: all 0.2s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
             user-select: none;
         }
 
-        .btn:hover {
-            background-color: var(--primary-hover);
-            transform: translateY(-1px);
-        }
-
-        .btn:active { transform: translateY(0); }
+        .btn:hover { background-color: var(--primary-hover); }
         .btn-success { background-color: var(--success); }
         .btn-success:hover { background-color: var(--success-hover); }
         .btn-danger { background-color: var(--danger); }
@@ -137,9 +143,7 @@
             color: var(--text-main);
             border: 1px solid var(--panel-border);
         }
-        .btn-outline:hover {
-            background: var(--panel-border);
-        }
+        .btn-outline:hover { background: var(--panel-border); }
         .btn-outline.active {
             background: var(--primary);
             color: white;
@@ -147,22 +151,22 @@
         }
 
         .btn-icon {
-            padding: 8px 10px;
-            border-radius: 8px;
+            padding: 6px 8px;
+            border-radius: 6px;
             background: transparent;
             color: var(--text-main);
             border: 1px solid var(--panel-border);
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
         }
         .btn-icon:hover { background: var(--panel-border); }
 
         input[type="file"] { display: none; }
 
-        /* Viewport & Canvas Area */
+        /* Viewport */
         .viewport {
             width: 100%;
-            max-width: 1300px;
+            max-width: 1450px;
             height: 72vh;
             background: var(--panel-bg);
             border: 2px dashed var(--panel-border);
@@ -198,6 +202,12 @@
             user-select: none;
         }
 
+        .pixel-perfect #image {
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            -ms-interpolation-mode: nearest-neighbor;
+        }
+
         .placeholder-text {
             color: var(--text-muted);
             text-align: center;
@@ -205,27 +215,32 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             padding: 20px;
         }
 
         /* Crop Boxes */
         .crop-box {
             position: absolute;
-            border: 2px solid var(--box-border);
+            border: 1.5px solid var(--box-border);
             background-color: var(--box-bg);
-            backdrop-filter: blur(2px);
-            border-radius: 6px;
+            border-radius: 2px;
             cursor: move;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        .crop-box.selected {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.4);
         }
 
         .crop-header {
             position: absolute;
-            top: -28px;
+            top: -20px;
             display: flex;
-            gap: 4px;
+            gap: 3px;
             align-items: center;
+            pointer-events: auto;
         }
 
         html[dir="rtl"] .crop-header { right: 0; }
@@ -234,9 +249,9 @@
         .crop-number {
             background: var(--primary);
             color: white;
-            font-size: 11px;
-            padding: 2px 8px;
-            border-radius: 4px;
+            font-size: 9px;
+            padding: 1px 4px;
+            border-radius: 2px;
             font-weight: bold;
         }
 
@@ -244,29 +259,60 @@
             background: var(--danger);
             color: white;
             border: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 4px;
+            width: 15px;
+            height: 15px;
+            border-radius: 2px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        .crop-delete:hover { background: var(--danger-hover); }
 
         .resize-handle {
-            width: 14px;
-            height: 14px;
+            width: 8px;
+            height: 8px;
             background-color: #fff;
-            border: 2px solid var(--primary);
+            border: 1px solid var(--primary);
             border-radius: 50%;
             position: absolute;
-            bottom: -7px;
+            bottom: -4px;
             cursor: nwse-resize;
         }
-        html[dir="rtl"] .resize-handle { left: -7px; }
-        html[dir="ltr"] .resize-handle { right: -7px; }
+        html[dir="rtl"] .resize-handle { left: -4px; }
+        html[dir="ltr"] .resize-handle { right: -4px; }
+
+        /* Guide Lines */
+        .guide-line {
+            position: absolute;
+            background-color: #ef4444 !important;
+            z-index: 25;
+            box-shadow: none !important;
+        }
+
+        .guide-line.vertical {
+            width: 2px;
+            height: 100%;
+            cursor: col-resize;
+            top: 0;
+            margin-left: -1px;
+        }
+
+        .guide-line.horizontal {
+            height: 2px;
+            width: 100%;
+            cursor: row-resize;
+            left: 0;
+            margin-top: -1px;
+        }
+
+        .guide-line::before {
+            content: '';
+            position: absolute;
+            background: transparent;
+        }
+        .guide-line.vertical::before { width: 12px; height: 100%; left: -5px; top: 0; }
+        .guide-line.horizontal::before { height: 12px; width: 100%; top: -5px; left: 0; }
 
         /* Floating Controls */
         .floating-controls {
@@ -274,11 +320,10 @@
             bottom: 16px;
             background: var(--panel-bg);
             border: 1px solid var(--panel-border);
-            backdrop-filter: blur(8px);
-            border-radius: 30px;
-            padding: 6px 14px;
+            border-radius: 20px;
+            padding: 4px 10px;
             display: flex;
-            gap: 10px;
+            gap: 8px;
             align-items: center;
             box-shadow: var(--shadow);
             z-index: 10;
@@ -288,39 +333,121 @@
         html[dir="ltr"] .floating-controls { right: 16px; }
 
         .floating-controls span {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
-            min-width: 45px;
+            min-width: 40px;
             text-align: center;
         }
 
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: var(--radius);
+            width: 90%;
+            max-width: 900px;
+            max-height: 85vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: var(--shadow);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--panel-border);
+            padding-bottom: 10px;
+        }
+
+        .modal-body {
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 12px;
+            padding: 10px 5px;
+        }
+
+        .preview-item {
+            border: 1px solid var(--panel-border);
+            border-radius: 8px;
+            padding: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            background: var(--bg-color);
+        }
+
+        .preview-item img {
+            max-width: 100%;
+            max-height: 100px;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+
+        .pixel-perfect .preview-item img {
+            image-rendering: pixelated;
+        }
+
+        .preview-item span {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: bold;
+        }
+
         .hint-bar {
-            margin-top: 10px;
-            font-size: 12px;
+            margin-top: 8px;
+            font-size: 11px;
             color: var(--text-muted);
             text-align: center;
         }
+
+        .sensitivity-control {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        .sensitivity-control input[type="range"] {
+            width: 75px;
+            cursor: pointer;
+        }
     </style>
 </head>
-<body>
+<body class="pixel-perfect">
 
     <!-- Toolbar -->
     <div class="toolbar">
         <div class="tool-group">
             <label for="upload" class="btn">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                 <span data-i18n="selectImage">انتخاب تصویر</span>
             </label>
             <input type="file" id="upload" accept="image/*">
 
             <div class="input-group">
-                <label data-i18n="prefix">پیشوند/نام:</label>
-                <input type="text" id="prefix-input" value="w">
+                <label data-i18n="prefix">پیشوند:</label>
+                <input type="text" id="prefix-input" value="asset">
             </div>
 
             <div class="input-group">
-                <label data-i18n="startIndex">شماره شروع:</label>
-                <input type="number" id="start-index" value="1" min="1">
+                <label data-i18n="startIndex">شروع:</label>
+                <input type="number" id="start-index" class="input-count" value="1" min="1">
             </div>
 
             <div class="input-group">
@@ -333,78 +460,194 @@
             </div>
         </div>
 
-        <div class="tool-group">
-            <button class="btn btn-outline" id="mode-toggle" title="حالت حرکت / انتخاب">
-                <span id="mode-icon">🖐️</span> <span id="mode-text" data-i18n="panMode">حالت جابه‌جایی</span>
-            </button>
+        <!-- Split Lines Panel -->
+        <div class="tool-panel">
+            <button class="btn btn-outline" id="btn-add-v-line" title="افزودن خط برش عمودی" data-i18n="addVLine">+ خط عمودی</button>
+            <button class="btn btn-outline" id="btn-add-h-line" title="افزودن خط برش افقی" data-i18n="addHLine">+ خط افقی</button>
+            <button class="btn btn-outline" id="btn-auto-grid-lines" title="ایجاد خودکار خطوط راهنما بر اساس تنظیمات شبکه" data-i18n="autoGridLines">⚡ ساخت شبکه خطوط</button>
+            <button class="btn btn-outline" id="btn-apply-split" style="border-color: var(--primary); color: var(--primary);" title="تبدیل خطوط به کادرهای برش" data-i18n="applySplit">✂️ اعمال تقسیم</button>
+        </div>
 
+        <!-- Grid Batch Panel -->
+        <div class="tool-panel">
+            <div class="input-group">
+                <label data-i18n="lblGrid">شبکه:</label>
+                <input type="number" id="grid-cols" class="input-count" value="4" min="1">
+                <span>×</span>
+                <input type="number" id="grid-rows" class="input-count" value="4" min="1">
+            </div>
+            <button class="btn btn-outline" id="btn-add-grid" data-i18n="addGrid">+ کادرهای شبکه</button>
+        </div>
+
+        <!-- Smart Detect Panel -->
+        <div class="tool-panel">
+            <button class="btn btn-outline" id="btn-smart-detect" title="تشخیص خودکار آیکون‌ها و Assetها">
+                🧠 <span data-i18n="smartDetect">تشخیص Assetها</span>
+            </button>
+            <div class="sensitivity-control">
+                <span data-i18n="sensitivity">حساسیت:</span>
+                <input type="range" id="detect-sensitivity" min="1" max="100" value="30">
+                <span id="sensitivity-val" style="font-weight: bold; width: 22px;">30</span>
+            </div>
+        </div>
+
+        <div class="tool-group">
+            <button class="btn btn-outline active" id="btn-pixel-perfect" title="فعال/غیرفعال‌سازی کیفیت پیکسلی">
+                👾 Pixel-Perfect
+            </button>
+            <button class="btn btn-outline" id="mode-toggle">
+                <span id="mode-icon">🖐️</span> <span id="mode-text" data-i18n="panMode">جابه‌جایی</span>
+            </button>
+            <button class="btn btn-outline" id="btn-preview" data-i18n="preview">پیش‌نمایش</button>
             <button class="btn btn-danger" id="clear-btn" data-i18n="clear">پاک‌سازی</button>
             <button class="btn btn-success" id="export-btn">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                 <span data-i18n="exportZip">دانلود ZIP</span>
             </button>
 
-            <button class="btn-icon" id="lang-toggle" title="English / فارسی">🌐 EN</button>
-            <button class="btn-icon" id="theme-toggle" title="Theme">🌙</button>
+            <button class="btn-icon" id="lang-toggle">🌐 EN</button>
+            <button class="btn-icon" id="theme-toggle">🌙</button>
         </div>
     </div>
 
     <!-- Viewport -->
     <div class="viewport mode-crop" id="viewport">
         <div class="placeholder-text" id="placeholder">
-            <svg width="52" height="52" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-            <p data-i18n="dropHint">تصویر را اینجا بکشید و رها کنید یا روی «انتخاب تصویر» کلیک کنید</p>
+            <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            <p data-i18n="dropHint">تصویر Asset Pack پیکسلی خود را کشیده و رها کنید</p>
         </div>
 
         <div id="image-wrapper" style="display: none;">
-            <img id="image" alt="Uploaded Image">
+            <img id="image" alt="Uploaded Pixel Art Image">
         </div>
 
-        <!-- Zoom Floating Controls -->
         <div class="floating-controls">
-            <button class="btn-icon" id="zoom-out" style="border:none; padding:2px 6px;">-</button>
+            <button class="btn-icon" id="zoom-out" style="border:none; padding:1px 5px;">-</button>
             <span id="zoom-level">100%</span>
-            <button class="btn-icon" id="zoom-in" style="border:none; padding:2px 6px;">+</button>
-            <button class="btn-icon" id="zoom-reset" style="border:none; padding:2px 6px;" title="Reset Zoom">↺</button>
+            <button class="btn-icon" id="zoom-in" style="border:none; padding:1px 5px;">+</button>
+            <button class="btn-icon" id="zoom-reset" style="border:none; padding:1px 5px;">↺</button>
         </div>
     </div>
 
     <div class="hint-bar" data-i18n="bottomHint">
-        💡 راهنما: با کلیک وسط موس (Scroll Wheel) یا فعال‌سازی «حالت جابه‌جایی» می‌توانید روی تصویر زوم‌شده حرکت کنید.
+        💡 اکنون می‌توانید با ساخت هوشمند خطوط بر اساس ابعاد شبکه، برش‌های فوق‌العاده دقیقی انجام دهید.
+    </div>
+
+    <!-- Preview Modal -->
+    <div class="modal-overlay" id="preview-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 data-i18n="previewTitle">پیش‌نمایش برش‌ها</h3>
+                <button class="btn-danger btn-icon" id="close-modal">✕</button>
+            </div>
+            <div class="modal-body" id="modal-grid"></div>
+        </div>
     </div>
 
     <script>
-        // Translations
+        // Offline Fallback ZIP Engine (Zero-dependency pure JS ZIP Builder)
+        class SimpleZip {
+            constructor() { this.files = []; }
+            file(name, base64Data) {
+                const binaryStr = atob(base64Data);
+                const bytes = new Uint8Array(binaryStr.length);
+                for (let i = 0; i < binaryStr.length; i++) bytes[i] = binaryStr.charCodeAt(i);
+                this.files.push({ name: name, data: bytes });
+            }
+            async generateAsync() {
+                let fileHeaders = [], offset = 0, parts = [];
+                for (let file of this.files) {
+                    const nameBytes = new TextEncoder().encode(file.name);
+                    const header = new Uint8Array(30 + nameBytes.length);
+                    const view = new DataView(header.buffer);
+                    view.setUint32(0, 0x04034b50, true); // Sign
+                    view.setUint16(6, 0, true); // Flags
+                    view.setUint16(8, 0, true); // Compression (Store)
+                    view.setUint32(18, file.data.length, true); // Compressed size
+                    view.setUint32(22, file.data.length, true); // Uncompressed size
+                    view.setUint16(26, nameBytes.length, true); // Name len
+                    header.set(nameBytes, 30);
+
+                    const cdHeader = new Uint8Array(46 + nameBytes.length);
+                    const cdView = new DataView(cdHeader.buffer);
+                    cdView.setUint32(0, 0x02014b50, true);
+                    cdView.setUint16(10, 0, true);
+                    cdView.setUint32(20, file.data.length, true);
+                    cdView.setUint32(24, file.data.length, true);
+                    cdView.setUint16(28, nameBytes.length, true);
+                    cdView.setUint32(42, offset, true);
+                    cdHeader.set(nameBytes, 46);
+
+                    fileHeaders.push(cdHeader);
+                    parts.push(header, file.data);
+                    offset += header.length + file.data.length;
+                }
+                let cdOffset = offset, cdSize = 0;
+                for (let cd of fileHeaders) { parts.push(cd); cdSize += cd.length; }
+
+                const eocd = new Uint8Array(22);
+                const eocdView = new DataView(eocd.buffer);
+                eocdView.setUint32(0, 0x06054b50, true);
+                eocdView.setUint16(8, this.files.length, true);
+                eocdView.setUint16(10, this.files.length, true);
+                eocdView.setUint32(12, cdSize, true);
+                eocdView.setUint32(16, cdOffset, true);
+                parts.push(eocd);
+
+                return new Blob(parts, { type: "application/zip" });
+            }
+        }
+
         const i18n = {
             fa: {
                 selectImage: "انتخاب تصویر",
-                prefix: "پیشوند/نام:",
-                startIndex: "شماره شروع:",
+                prefix: "پیشوند:",
+                startIndex: "شروع:",
                 format: "فرمت:",
+                lblGrid: "شبکه:",
+                addGrid: "+ کادرهای شبکه",
+                addVLine: "+ خط عمودی",
+                addHLine: "+ خط افقی",
+                autoGridLines: "⚡ ساخت شبکه خطوط",
+                applySplit: "✂️ اعمال تقسیم",
+                smartDetect: "تشخیص Assetها",
+                sensitivity: "حساسیت:",
+                preview: "پیش‌نمایش",
                 clear: "پاک‌سازی",
                 exportZip: "دانلود ZIP",
-                panMode: "حالت جابه‌جایی",
-                cropMode: "حالت برش",
-                dropHint: "تصویر را اینجا بکشید و رها کنید یا روی «انتخاب تصویر» کلیک کنید",
-                bottomHint: "💡 راهنما: با کلیک وسط موس (Scroll Wheel) یا فعال‌سازی «حالت جابه‌جایی» می‌توانید روی تصویر زوم‌شده حرکت کنید.",
-                alertNoImg: "لطفاً تصویری انتخاب کرده و حداقل یک مربع روی آن مشخص کنید.",
+                panMode: "جابه‌جایی",
+                cropMode: "برش",
+                dropHint: "تصویر Asset Pack پیکسلی خود را کشیده و رها کنید",
+                bottomHint: "💡 اکنون می‌توانید با ساخت هوشمند خطوط بر اساس ابعاد شبکه، برش‌های فوق‌العاده دقیقی انجام دهید.",
+                previewTitle: "پیش‌نمایش قطعات برش‌خورده",
+                alertNoImg: "لطفاً تصویری انتخاب کرده و حداقل یک کادر روی آن مشخص کنید.",
             },
             en: {
                 selectImage: "Select Image",
-                prefix: "Prefix/Name:",
+                prefix: "Prefix:",
                 startIndex: "Start Index:",
                 format: "Format:",
+                lblGrid: "Grid:",
+                addGrid: "+ Grid Boxes",
+                addVLine: "+ V-Line",
+                addHLine: "+ H-Line",
+                autoGridLines: "⚡ Auto Grid Lines",
+                applySplit: "✂️ Apply Split",
+                smartDetect: "Smart Detect",
+                sensitivity: "Sens:",
+                preview: "Preview",
                 clear: "Clear All",
                 exportZip: "Export ZIP",
                 panMode: "Pan Tool",
                 cropMode: "Crop Tool",
-                dropHint: "Drag & Drop image here or click 'Select Image'",
-                bottomHint: "💡 Hint: Use Middle Mouse Button drag or activate 'Pan Tool' to move zoomed image.",
+                dropHint: "Drag & Drop your pixel art asset pack image here",
+                bottomHint: "💡 Smart Asset Detection algorithm and Full Offline Mode activated.",
+                previewTitle: "Cropped Sections Preview",
                 alertNoImg: "Please load an image and create at least one crop box.",
             }
         };
 
-        let currentLang = localStorage.getItem('lang') || 'en';
+        let currentLang = localStorage.getItem('lang') || 'fa';
 
         function applyLanguage(lang) {
             currentLang = lang;
@@ -416,14 +659,12 @@
 
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
-                if (i18n[lang][key]) {
-                    el.innerText = i18n[lang][key];
-                }
+                if (i18n[lang][key]) el.innerText = i18n[lang][key];
             });
             updateModeUI();
         }
 
-        // Elements
+        // DOM Elements
         const uploadInput = document.getElementById('upload');
         const img = document.getElementById('image');
         const imageWrapper = document.getElementById('image-wrapper');
@@ -437,47 +678,70 @@
         const themeToggleBtn = document.getElementById('theme-toggle');
         const langToggleBtn = document.getElementById('lang-toggle');
         const modeToggleBtn = document.getElementById('mode-toggle');
+        const btnAddGrid = document.getElementById('btn-add-grid');
+        const btnSmartDetect = document.getElementById('btn-smart-detect');
+        const btnPixelPerfect = document.getElementById('btn-pixel-perfect');
+        const sensitivityInput = document.getElementById('detect-sensitivity');
+        const sensitivityVal = document.getElementById('sensitivity-val');
+        const btnAddVLine = document.getElementById('btn-add-v-line');
+        const btnAddHLine = document.getElementById('btn-add-h-line');
+        const btnAutoGridLines = document.getElementById('btn-auto-grid-lines');
+        const btnApplySplit = document.getElementById('btn-apply-split');
+        const btnPreview = document.getElementById('btn-preview');
+        const previewModal = document.getElementById('preview-modal');
+        const closeModalBtn = document.getElementById('close-modal');
+        const modalGrid = document.getElementById('modal-grid');
 
         let boxes = [];
+        let guideLines = [];
         let boxCounter = 0;
+        let selectedBox = null;
+
         let scale = 1;
         let panX = 0, panY = 0;
-        let activeTool = 'crop'; // 'crop' or 'pan'
+        let activeTool = 'crop'; 
         let isMiddlePanning = false;
         let isToolPanning = false;
+        let isSpacePressed = false;
         let panStartX = 0, panStartY = 0;
 
-        // Theme Toggle
+        sensitivityInput.addEventListener('input', () => {
+            sensitivityVal.innerText = sensitivityInput.value;
+        });
+
+        btnPixelPerfect.addEventListener('click', () => {
+            document.body.classList.toggle('pixel-perfect');
+            btnPixelPerfect.classList.toggle('active');
+        });
+
         themeToggleBtn.addEventListener('click', () => {
             document.body.classList.toggle('dark-mode');
             const isDark = document.body.classList.contains('dark-mode');
             themeToggleBtn.innerText = isDark ? '☀️' : '🌙';
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
         });
-        if (localStorage.getItem('theme') === 'dark') {
-            document.body.classList.add('dark-mode');
-            themeToggleBtn.innerText = '☀️';
-        }
 
-        // Language Toggle
-        langToggleBtn.addEventListener('click', () => {
-            applyLanguage(currentLang === 'fa' ? 'en' : 'fa');
-        });
+        langToggleBtn.addEventListener('click', () => applyLanguage(currentLang === 'fa' ? 'en' : 'fa'));
 
-        // Mode Toggle (Crop / Pan)
         function updateModeUI() {
             const modeIcon = document.getElementById('mode-icon');
             const modeText = document.getElementById('mode-text');
-            if (activeTool === 'pan') {
-                modeToggleBtn.classList.add('active');
+            const isPan = activeTool === 'pan' || isSpacePressed;
+            
+            if (isPan) {
                 viewport.classList.remove('mode-crop');
                 viewport.classList.add('mode-pan');
+            } else {
+                viewport.classList.remove('mode-pan');
+                viewport.classList.add('mode-crop');
+            }
+
+            if (activeTool === 'pan') {
+                modeToggleBtn.classList.add('active');
                 modeIcon.innerText = '✂️';
                 modeText.innerText = i18n[currentLang].cropMode;
             } else {
                 modeToggleBtn.classList.remove('active');
-                viewport.classList.remove('mode-pan');
-                viewport.classList.add('mode-crop');
                 modeIcon.innerText = '🖐️';
                 modeText.innerText = i18n[currentLang].panMode;
             }
@@ -488,7 +752,23 @@
             updateModeUI();
         });
 
-        // Load Image File
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && !isSpacePressed && e.target.tagName !== 'INPUT') {
+                isSpacePressed = true;
+                updateModeUI();
+            }
+            if ((e.code === 'Delete' || e.code === 'Backspace') && selectedBox && e.target.tagName !== 'INPUT') {
+                removeBox(selectedBox);
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (e.code === 'Space') {
+                isSpacePressed = false;
+                updateModeUI();
+            }
+        });
+
         function loadImageFile(file) {
             if (!file || !file.type.startsWith('image/')) return;
             const reader = new FileReader();
@@ -506,54 +786,66 @@
 
         uploadInput.addEventListener('change', (e) => loadImageFile(e.target.files[0]));
 
-        // Drag & Drop
-        viewport.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            viewport.classList.add('drag-over');
-        });
+        viewport.addEventListener('dragover', (e) => { e.preventDefault(); viewport.classList.add('drag-over'); });
         viewport.addEventListener('dragleave', () => viewport.classList.remove('drag-over'));
         viewport.addEventListener('drop', (e) => {
             e.preventDefault();
             viewport.classList.remove('drag-over');
-            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-                loadImageFile(e.dataTransfer.files[0]);
-            }
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) loadImageFile(e.dataTransfer.files[0]);
         });
 
-        // Zoom & Pan Engine
         function updateTransform() {
             imageWrapper.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
             document.getElementById('zoom-level').innerText = `${Math.round(scale * 100)}%`;
         }
 
         function resetZoom() {
+            if (!img.clientWidth) return;
             scale = 1;
             panX = (viewport.clientWidth - img.clientWidth) / 2;
             panY = (viewport.clientHeight - img.clientHeight) / 2;
             updateTransform();
         }
 
-        document.getElementById('zoom-in').addEventListener('click', () => { scale = Math.min(scale + 0.15, 5); updateTransform(); });
-        document.getElementById('zoom-out').addEventListener('click', () => { scale = Math.max(scale - 0.15, 0.2); updateTransform(); });
+        function zoomAtPoint(newScale, clientX, clientY) {
+            newScale = Math.min(Math.max(0.15, newScale), 15);
+            const rect = viewport.getBoundingClientRect();
+            const mouseX = clientX - rect.left;
+            const mouseY = clientY - rect.top;
+
+            const imagePointX = (mouseX - panX) / scale;
+            const imagePointY = (mouseY - panY) / scale;
+
+            scale = newScale;
+            panX = mouseX - imagePointX * scale;
+            panY = mouseY - imagePointY * scale;
+
+            updateTransform();
+        }
+
+        document.getElementById('zoom-in').addEventListener('click', () => {
+            const rect = viewport.getBoundingClientRect();
+            zoomAtPoint(scale * 1.3, rect.left + rect.width / 2, rect.top + rect.height / 2);
+        });
+        document.getElementById('zoom-out').addEventListener('click', () => {
+            const rect = viewport.getBoundingClientRect();
+            zoomAtPoint(scale / 1.3, rect.left + rect.width / 2, rect.top + rect.height / 2);
+        });
         document.getElementById('zoom-reset').addEventListener('click', resetZoom);
 
         viewport.addEventListener('wheel', (e) => {
             if (!img.src) return;
             e.preventDefault();
-            const delta = e.deltaY < 0 ? 0.1 : -0.1;
-            scale = Math.min(Math.max(0.2, scale + delta), 5);
-            updateTransform();
+            const zoomFactor = e.deltaY < 0 ? 1.15 : 0.85;
+            zoomAtPoint(scale * zoomFactor, e.clientX, e.clientY);
         }, { passive: false });
 
-        // Middle Mouse & Pan Mode Handling
         viewport.addEventListener('mousedown', (e) => {
             if (!img.src) return;
-
-            // Middle Mouse Click (button 1) OR Pan Tool Active (button 0)
-            if (e.button === 1 || (activeTool === 'pan' && e.button === 0)) {
+            if (e.button === 1 || activeTool === 'pan' || isSpacePressed) {
                 e.preventDefault();
                 if (e.button === 1) isMiddlePanning = true;
-                if (activeTool === 'pan' && e.button === 0) isToolPanning = true;
+                else isToolPanning = true;
                 panStartX = e.clientX - panX;
                 panStartY = e.clientY - panY;
             }
@@ -572,18 +864,63 @@
             if (e.button === 0) isToolPanning = false;
         });
 
-        // Create Crop Box
-        viewport.addEventListener('click', (e) => {
-            if (!img.src || activeTool !== 'crop' || e.button !== 0) return;
+        // Box Creation
+        let isDrawingBox = false;
+        let drawStartX = 0, drawStartY = 0;
+        let currentDrawingBox = null;
+
+        viewport.addEventListener('mousedown', (e) => {
+            if (!img.src || activeTool !== 'crop' || isSpacePressed || e.button !== 0) return;
             if (e.target !== viewport && e.target !== imageWrapper && e.target !== img) return;
 
             const rect = imageWrapper.getBoundingClientRect();
-            const clickX = (e.clientX - rect.left) / scale;
-            const clickY = (e.clientY - rect.top) / scale;
+            drawStartX = Math.max(0, Math.min((e.clientX - rect.left) / scale, img.clientWidth));
+            drawStartY = Math.max(0, Math.min((e.clientY - rect.top) / scale, img.clientHeight));
 
-            const defaultSize = 120;
+            isDrawingBox = true;
             boxCounter++;
-            createBox(clickX, clickY, defaultSize, defaultSize, boxCounter);
+            currentDrawingBox = createBox(drawStartX, drawStartY, 0, 0, boxCounter);
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDrawingBox || !currentDrawingBox) return;
+
+            const rect = imageWrapper.getBoundingClientRect();
+            let currentX = (e.clientX - rect.left) / scale;
+            let currentY = (e.clientY - rect.top) / scale;
+
+            currentX = Math.max(0, Math.min(currentX, img.clientWidth));
+            currentY = Math.max(0, Math.min(currentY, img.clientHeight));
+
+            const width = Math.abs(currentX - drawStartX);
+            const height = Math.abs(currentY - drawStartY);
+            const left = Math.min(drawStartX, currentX);
+            const top = Math.min(drawStartY, currentY);
+
+            currentDrawingBox.element.style.width = `${width}px`;
+            currentDrawingBox.element.style.height = `${height}px`;
+            currentDrawingBox.element.style.left = `${left}px`;
+            currentDrawingBox.element.style.top = `${top}px`;
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (isDrawingBox) {
+                isDrawingBox = false;
+                if (currentDrawingBox) {
+                    const w = parseInt(currentDrawingBox.element.style.width, 10);
+                    const h = parseInt(currentDrawingBox.element.style.height, 10);
+                    if (w < 4 || h < 4) {
+                        let left = Math.min(drawStartX, img.clientWidth - 16);
+                        let top = Math.min(drawStartY, img.clientHeight - 16);
+                        currentDrawingBox.element.style.width = `16px`;
+                        currentDrawingBox.element.style.height = `16px`;
+                        currentDrawingBox.element.style.left = `${Math.max(0, left)}px`;
+                        currentDrawingBox.element.style.top = `${Math.max(0, top)}px`;
+                    }
+                    selectBox(currentDrawingBox);
+                }
+                currentDrawingBox = null;
+            }
         });
 
         function createBox(x, y, width, height, number) {
@@ -622,35 +959,262 @@
             const boxData = { element: box, id: number };
             boxes.push(boxData);
 
-            makeDraggable(box);
-            makeResizable(box, handle);
+            box.addEventListener('mousedown', (e) => {
+                if (e.button === 0) selectBox(boxData);
+            });
+
+            makeDraggable(boxData);
+            makeResizable(boxData, handle);
+
+            return boxData;
+        }
+
+        function selectBox(boxData) {
+            boxes.forEach(b => b.element.classList.remove('selected'));
+            selectedBox = boxData;
+            if (boxData) boxData.element.classList.add('selected');
         }
 
         function removeBox(boxData) {
             boxData.element.remove();
             boxes = boxes.filter(b => b !== boxData);
+            if (selectedBox === boxData) selectedBox = null;
         }
 
         function clearBoxes() {
             boxes.forEach(b => b.element.remove());
+            guideLines.forEach(g => g.element.remove());
             boxes = [];
+            guideLines = [];
             boxCounter = 0;
+            selectedBox = null;
         }
 
         clearBtn.addEventListener('click', clearBoxes);
 
-        function makeDraggable(element) {
+        // --- SPLIT LINES LOGIC ---
+        function createGuideLine(type, pos = null) {
+            if (!img.src) return;
+            const line = document.createElement('div');
+            line.className = `guide-line ${type}`;
+
+            if (pos === null) {
+                pos = type === 'vertical' ? img.clientWidth / 2 : img.clientHeight / 2;
+            }
+
+            if (type === 'vertical') line.style.left = `${pos}px`;
+            else line.style.top = `${pos}px`;
+
+            imageWrapper.appendChild(line);
+
+            const guideData = { element: line, type: type, pos: pos };
+            guideLines.push(guideData);
+
+            let isDraggingLine = false;
+
+            line.addEventListener('mousedown', (e) => {
+                if (e.button !== 0) return;
+                isDraggingLine = true;
+                e.stopPropagation();
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                if (!isDraggingLine) return;
+                const rect = imageWrapper.getBoundingClientRect();
+                if (type === 'vertical') {
+                    let newX = (e.clientX - rect.left) / scale;
+                    newX = Math.max(0, Math.min(newX, img.clientWidth));
+                    line.style.left = `${newX}px`;
+                    guideData.pos = newX;
+                } else {
+                    let newY = (e.clientY - rect.top) / scale;
+                    newY = Math.max(0, Math.min(newY, img.clientHeight));
+                    line.style.top = `${newY}px`;
+                    guideData.pos = newY;
+                }
+            });
+
+            window.addEventListener('mouseup', () => { isDraggingLine = false; });
+        }
+
+        btnAddVLine.addEventListener('click', () => createGuideLine('vertical'));
+        btnAddHLine.addEventListener('click', () => createGuideLine('horizontal'));
+
+        btnAutoGridLines.addEventListener('click', () => {
+            if (!img.src) return;
+            guideLines.forEach(g => g.element.remove());
+            guideLines = [];
+
+            const cols = parseInt(document.getElementById('grid-cols').value, 10) || 1;
+            const rows = parseInt(document.getElementById('grid-rows').value, 10) || 1;
+
+            const colWidth = img.clientWidth / cols;
+            const rowHeight = img.clientHeight / rows;
+
+            for (let c = 1; c < cols; c++) createGuideLine('vertical', c * colWidth);
+            for (let r = 1; r < rows; r++) createGuideLine('horizontal', r * rowHeight);
+        });
+
+        btnApplySplit.addEventListener('click', () => {
+            if (!img.src || guideLines.length === 0) return;
+
+            const vLines = guideLines.filter(g => g.type === 'vertical').map(g => g.pos).sort((a, b) => a - b);
+            const hLines = guideLines.filter(g => g.type === 'horizontal').map(g => g.pos).sort((a, b) => a - b);
+
+            const xCoords = [0, ...vLines, img.clientWidth];
+            const yCoords = [0, ...hLines, img.clientHeight];
+
+            boxes.forEach(b => b.element.remove());
+            boxes = [];
+            boxCounter = 0;
+
+            for (let i = 0; i < yCoords.length - 1; i++) {
+                for (let j = 0; j < xCoords.length - 1; j++) {
+                    const x = xCoords[j];
+                    const y = yCoords[i];
+                    const w = xCoords[j + 1] - x;
+                    const h = yCoords[i + 1] - y;
+
+                    if (w > 2 && h > 2) {
+                        boxCounter++;
+                        createBox(x, y, w, h, boxCounter);
+                    }
+                }
+            }
+        });
+
+        btnAddGrid.addEventListener('click', () => {
+            if (!img.src) return;
+            const cols = parseInt(document.getElementById('grid-cols').value, 10) || 1;
+            const rows = parseInt(document.getElementById('grid-rows').value, 10) || 1;
+
+            const w = img.clientWidth / cols;
+            const h = img.clientHeight / rows;
+
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    boxCounter++;
+                    createBox(c * w, r * h, w, h, boxCounter);
+                }
+            }
+        });
+
+        // REFACTORED SMART DETECT ALGORITHM (OPTIMIZED & FREEZE-FREE)
+        btnSmartDetect.addEventListener('click', () => {
+            if (!img.src) return;
+            clearBoxes();
+
+            const sens = parseInt(sensitivityInput.value, 10);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const w = img.naturalWidth;
+            const h = img.naturalHeight;
+            canvas.width = w;
+            canvas.height = h;
+            ctx.drawImage(img, 0, 0);
+
+            const imageData = ctx.getImageData(0, 0, w, h);
+            const data = imageData.data;
+
+            // Background Reference Colors (Corners Averaging for dynamic BG)
+            const bgR = data[0], bgG = data[1], bgB = data[2], bgA = data[3];
+
+            // Sens Threshold Formula Fix
+            const threshold = (101 - sens) * 3.5; 
+
+            function isForegroundPixel(x, y) {
+                const idx = (y * w + x) * 4;
+                const r = data[idx], g = data[idx+1], b = data[idx+2], a = data[idx+3];
+                
+                if (bgA < 20) return a > 30; // Alpha mode
+
+                const diffR = r - bgR;
+                const diffG = g - bgG;
+                const diffB = b - bgB;
+                const dist = Math.sqrt(diffR*diffR + diffG*diffG + diffB*diffB);
+
+                return dist > threshold;
+            }
+
+            const visited = new Uint8Array(w * h);
+            const foundBoxes = [];
+            const displayScaleX = img.clientWidth / w;
+            const displayScaleY = img.clientHeight / h;
+
+            for (let y = 0; y < h; y++) {
+                for (let x = 0; x < w; x++) {
+                    const pixelIdx = y * w + x;
+                    if (!visited[pixelIdx] && isForegroundPixel(x, y)) {
+                        let minX = x, maxX = x, minY = y, maxY = y;
+                        let pixelCount = 0;
+                        const stack = [x, y];
+                        visited[pixelIdx] = 1;
+
+                        while (stack.length > 0) {
+                            const cy = stack.pop();
+                            const cx = stack.pop();
+                            pixelCount++;
+
+                            if (cx < minX) minX = cx;
+                            if (cx > maxX) maxX = cx;
+                            if (cy < minY) minY = cy;
+                            if (cy > maxY) maxY = cy;
+
+                            const neighbors = [
+                                cx + 1, cy,
+                                cx - 1, cy,
+                                cx, cy + 1,
+                                cx, cy - 1
+                            ];
+
+                            for (let i = 0; i < neighbors.length; i += 2) {
+                                const nx = neighbors[i];
+                                const ny = neighbors[i + 1];
+                                if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
+                                    const nIdx = ny * w + nx;
+                                    if (!visited[nIdx] && isForegroundPixel(nx, ny)) {
+                                        visited[nIdx] = 1;
+                                        stack.push(nx, ny);
+                                    }
+                                }
+                            }
+                        }
+
+                        const boxW = (maxX - minX + 1);
+                        const boxH = (maxY - minY + 1);
+
+                        // Prevent freezes by discarding noise/tiny boxes (< 6px or <= 12 total pixels)
+                        if (boxW >= 6 && boxH >= 6 && pixelCount >= 12) {
+                            foundBoxes.push({
+                                x: minX * displayScaleX,
+                                y: minY * displayScaleY,
+                                w: boxW * displayScaleX,
+                                h: boxH * displayScaleY
+                            });
+                        }
+                    }
+                }
+            }
+
+            foundBoxes.forEach(b => {
+                boxCounter++;
+                createBox(b.x, b.y, b.w, b.h, boxCounter);
+            });
+        });
+
+        // Draggable & Resizable Fixes
+        function makeDraggable(boxData) {
+            const element = boxData.element;
             let isDragging = false;
             let startX, startY, initialLeft, initialTop;
 
             element.addEventListener('mousedown', (e) => {
-                if (activeTool === 'pan' || e.button !== 0) return;
+                if (activeTool === 'pan' || isSpacePressed || e.button !== 0) return;
                 if (e.target.classList.contains('resize-handle') || e.target.classList.contains('crop-delete')) return;
+                
                 isDragging = true;
-                startX = e.clientX;
-                startY = e.clientY;
-                initialLeft = element.offsetLeft;
-                initialTop = element.offsetTop;
+                startX = e.clientX; startY = e.clientY;
+                initialLeft = element.offsetLeft; initialTop = element.offsetTop;
                 e.stopPropagation();
             });
 
@@ -669,52 +1233,107 @@
             window.addEventListener('mouseup', () => { isDragging = false; });
         }
 
-        function makeResizable(element, handle) {
+        function makeResizable(boxData, handle) {
+            const element = boxData.element;
             let isResizing = false;
-            let startX, startY, startWidth, startHeight;
+            let startX, startY, startWidth, startHeight, startLeft;
 
             handle.addEventListener('mousedown', (e) => {
                 if (e.button !== 0) return;
                 isResizing = true;
-                startX = e.clientX;
-                startY = e.clientY;
+                startX = e.clientX; startY = e.clientY;
                 startWidth = parseInt(document.defaultView.getComputedStyle(element).width, 10);
                 startHeight = parseInt(document.defaultView.getComputedStyle(element).height, 10);
+                startLeft = element.offsetLeft;
                 e.stopPropagation();
             });
 
             window.addEventListener('mousemove', (e) => {
                 if (!isResizing) return;
-                const isRtl = currentLang === 'fa';
                 const dx = (e.clientX - startX) / scale;
                 const dy = (e.clientY - startY) / scale;
 
-                const newWidth = Math.max(30, isRtl ? startWidth - dx : startWidth + dx);
-                const newHeight = Math.max(30, startHeight + dy);
+                let newWidth = Math.max(4, startWidth + dx);
+                element.style.width = `${Math.min(newWidth, img.clientWidth - startLeft)}px`;
 
-                element.style.width = `${newWidth}px`;
-                element.style.height = `${newHeight}px`;
+                let newHeight = Math.max(4, startHeight + dy);
+                element.style.height = `${Math.min(newHeight, img.clientHeight - element.offsetTop)}px`;
             });
 
             window.addEventListener('mouseup', () => { isResizing = false; });
         }
 
-        // Export ZIP
+        // Preview Modal
+        btnPreview.addEventListener('click', () => {
+            if (boxes.length === 0 || !img.src) {
+                alert(i18n[currentLang].alertNoImg);
+                return;
+            }
+
+            modalGrid.innerHTML = '';
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.imageSmoothingEnabled = !document.body.classList.contains('pixel-perfect');
+
+            const scaleX = img.naturalWidth / img.clientWidth;
+            const scaleY = img.naturalHeight / img.clientHeight;
+
+            let startNum = parseInt(startIndexInput.value, 10) || 1;
+            const prefix = prefixInput.value.trim() || 'asset';
+            const mimeType = exportFormatSelect.value;
+            const ext = mimeType.split('/')[1];
+
+            boxes.forEach((boxData, i) => {
+                const box = boxData.element;
+                const x = box.offsetLeft * scaleX;
+                const y = box.offsetTop * scaleY;
+                const width = box.clientWidth * scaleX;
+                const height = box.clientHeight * scaleY;
+
+                canvas.width = width;
+                canvas.height = height;
+                ctx.drawImage(img, x, y, width, height, 0, 0, width, height);
+
+                const itemWrapper = document.createElement('div');
+                itemWrapper.className = 'preview-item';
+
+                const previewImg = document.createElement('img');
+                previewImg.src = canvas.toDataURL(mimeType);
+
+                const currentNum = startNum + i;
+                const formattedNum = String(currentNum).padStart(4, '0');
+                const label = document.createElement('span');
+                label.innerText = `${prefix}${formattedNum}.${ext}`;
+
+                itemWrapper.appendChild(previewImg);
+                itemWrapper.appendChild(label);
+                modalGrid.appendChild(itemWrapper);
+            });
+
+            previewModal.style.display = 'flex';
+        });
+
+        closeModalBtn.addEventListener('click', () => { previewModal.style.display = 'none'; });
+        previewModal.addEventListener('click', (e) => { if (e.target === previewModal) previewModal.style.display = 'none'; });
+
+        // Export ZIP Logic (Supports Offline Mode)
         exportBtn.addEventListener('click', async () => {
             if (boxes.length === 0 || !img.src) {
                 alert(i18n[currentLang].alertNoImg);
                 return;
             }
 
-            const zip = new JSZip();
+            // Fallback to offline SimpleZip if JSZip is not loaded
+            const zip = window.JSZip ? new JSZip() : new SimpleZip();
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
+            ctx.imageSmoothingEnabled = !document.body.classList.contains('pixel-perfect');
 
             const scaleX = img.naturalWidth / img.clientWidth;
             const scaleY = img.naturalHeight / img.clientHeight;
 
             let startNum = parseInt(startIndexInput.value, 10) || 1;
-            const prefix = prefixInput.value.trim() || 'w';
+            const prefix = prefixInput.value.trim() || 'asset';
             const mimeType = exportFormatSelect.value;
             const ext = mimeType.split('/')[1];
 
@@ -731,7 +1350,7 @@
 
                 ctx.drawImage(img, x, y, width, height, 0, 0, width, height);
 
-                const dataUrl = canvas.toDataURL(mimeType, 0.95);
+                const dataUrl = canvas.toDataURL(mimeType, 1.0);
                 const base64Data = dataUrl.replace(new RegExp(`^data:${mimeType};base64,`), "");
 
                 const currentNum = startNum + i;
@@ -746,11 +1365,10 @@
             const content = await zip.generateAsync({ type: "blob" });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(content);
-            link.download = `cropped_images_${Date.now()}.zip`;
+            link.download = `pixel_assets_${Date.now()}.zip`;
             link.click();
         });
 
-        // Initialize i18n
         applyLanguage(currentLang);
     </script>
 </body>
