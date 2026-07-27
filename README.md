@@ -20,7 +20,7 @@
 
 # 🎨 Image Splitter
 
-> **A powerful, client-side web application for splitting pixel art, sprite sheets, and asset packs with ease.**
+> **Image splitter free open source powerful, client-side web application for splitting pixel art, sprite sheets, and asset packs with ease.**
 
 ---
 
