@@ -96,6 +96,10 @@
 
 If you find this project useful, you can support its development:
 
+<p align="center">
+  <img src="assets/ByMeCoffee.jpg" alt="ByMeCoffee Preview" width="800"/>
+</p>
+
 - **Monero (XMR)** *(Preferred for privacy)*:
 8B7ukqcbMLdhDzLvUFVjQu3oHhK6SFAvtJt7BtvuqdcsFXicSBxQkSLdCzDaK7gRibUQHnXy3z2r5c3CSkghvckc1zbueVg
 
